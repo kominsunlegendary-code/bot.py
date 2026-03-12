@@ -18,8 +18,8 @@ chat_locks = defaultdict(asyncio.Lock)
 
 from datetime import datetime, time
 
-ACTIVE_START = time(7, 0)
-ACTIVE_END = time(22, 0)
+ACTIVE_START = time(0, 01)
+ACTIVE_END = time(23, 59)
 
 def is_active_window():
     now = datetime.now().time()
@@ -147,4 +147,5 @@ async def fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Please send a PDF file.")
 
 app.add_handler(MessageHandler(filters.ALL, fallback))
+
 app.run_polling(timeout=120)
