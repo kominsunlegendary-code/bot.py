@@ -134,9 +134,9 @@ app = (
     ApplicationBuilder()
     .token(TOKEN)
     .connect_timeout(20)
-    .read_timeout(120)
-    .write_timeout(120)
-    .media_write_timeout(180)
+    .read_timeout(300)
+    .write_timeout(300)
+    .media_write_timeout(600)
     .pool_timeout(20)
     .build()
 )
@@ -149,4 +149,5 @@ async def fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app.add_handler(MessageHandler(filters.ALL, fallback))
 
 app.run_polling(timeout=120)
+
 
