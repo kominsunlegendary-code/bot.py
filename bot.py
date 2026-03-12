@@ -23,7 +23,7 @@ ACTIVE_END = time(23, 59)
 
 def is_active_window():
     now = datetime.now().time()
-    return ACTIVE_START <= now < ACTIVE_END
+    return ACTIVE_START <= now <= ACTIVE_END
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Send me a PDF, and I will return extracted images.")
@@ -149,3 +149,4 @@ async def fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app.add_handler(MessageHandler(filters.ALL, fallback))
 
 app.run_polling(timeout=120)
+
