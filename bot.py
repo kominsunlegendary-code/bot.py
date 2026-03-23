@@ -16,10 +16,16 @@ TOKEN = "8555727406:AAGP2-fR8GCUJBOr8AhblJw0-G7WNWrOocU"
 TARGET_CHAT_ID = -5240584670  # replace with your destination group ID
 chat_locks = defaultdict(asyncio.Lock)
 
-from datetime import datetime, time
+from datetime import datetime, timezone, timedelta, time
 
-ACTIVE_START = time(0, 01)
-ACTIVE_END = time(23, 59)
+ICT = timezone(timedelta(hours=7))
+
+ACTIVE_START = time(9, 0)   # 9:00 AM ICT
+ACTIVE_END = time(22, 0)    # 10:00 PM ICT
+
+def is_active_window():
+    now = datetime.now(ICT).time()
+    return ACTIVE_START <= now <= ACTIVE_END
 
 def is_active_window():
     now = datetime.now().time()
