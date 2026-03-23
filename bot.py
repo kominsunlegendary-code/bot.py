@@ -70,7 +70,7 @@ async def send_images_batch(update: Update, context: ContextTypes.DEFAULT_TYPE, 
 async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     if not is_active_window():
-        await context.bot.send_message(chat_id=chat_id, text="Service hours are 07:00-22:00. Please try again during that period.")
+        await context.bot.send_message(chat_id=chat_id, text="Service hours are 09:00-22:00. Please try again during that period.")
         return
 
     lock = chat_locks[chat_id]
