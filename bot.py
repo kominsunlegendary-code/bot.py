@@ -120,7 +120,19 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await send_images_batch(update, context, filtered_images, TARGET_CHAT_ID)
 
                 base_name = os.path.splitext(file.file_name or "file.pdf")[0]
-                await send_with_retry(context.bot.send_message, chat_id=TARGET_CHAT_ID, text=f"{base_name}")
+
+                # Extract shortcut from base_name
+                shortcut = None
+                for i in range(1, 46):
+                    var_name = f"SHORTCUT_{i}"
+                    shortcut_value = os.getenv(var_name, "")
+                    if shortcut_value.upper() in base_name.upper():
+                        shortcut = shortcut_value
+                break
+
+                # Send the shortcut or original name if no match
+                final_text = shortcut if shortcut else base_name
+                await send_with_retry(context.bot.send_message, chat_id=TARGET_CHAT_ID, text=f"{final_text}")
 
         except Exception as exc:
             await context.bot.send_message(chat_id=chat_id, text="Error processing PDF. Try a smaller/cleaner file.")
