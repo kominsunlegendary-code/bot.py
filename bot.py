@@ -27,10 +27,6 @@ def is_active_window():
     now = datetime.now(ICT).time()
     return ACTIVE_START <= now <= ACTIVE_END
 
-def is_active_window():
-    now = datetime.now().time()
-    return ACTIVE_START <= now <= ACTIVE_END
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Send me a PDF, and I will return extracted images.")
 
