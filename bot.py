@@ -128,7 +128,7 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     shortcut_value = os.getenv(var_name, "")
                     if shortcut_value.upper() in base_name.upper():
                         shortcut = shortcut_value
-                break
+                    break
 
                 # Send the shortcut or original name if no match
                 final_text = shortcut if shortcut else base_name
