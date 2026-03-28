@@ -124,11 +124,11 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # Extract shortcut from base_name
                 shortcut = None
                 for i in range(1, 46):
-                    var_name = f"SHORTCUT_{i}"
-                    shortcut_value = os.getenv(var_name, "")
-                    if shortcut_value.upper() in base_name.upper():
-                        shortcut = shortcut_value
-                    break
+                    location_value = os.getenv(f"LOCATION_{i}", "")
+                    if location_value and location_value.upper() in base_name.upper():
+                        shortcut = os.getenv(f"SHORTCUT_{i}", "")
+                        break
+
 
                 # Send the shortcut or original name if no match
                 final_text = shortcut if shortcut else base_name
