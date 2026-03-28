@@ -121,18 +121,18 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 base_name = os.path.splitext(file.file_name or "file.pdf")[0]
 
-                # Extract shortcut from base_name
+                # Match LOCATION_X against filename, send corresponding SHORTCUT_X
                 shortcut = None
                 for i in range(1, 46):
-                    var_name = f"SHORTCUT_{i}"
-                    shortcut_value = os.getenv(var_name, "")
-                    if shortcut_value.upper() in base_name.upper():
-                        shortcut = shortcut_value
-                    break
+                    location_value = os.getenv(f"LOCATION_{i}", "")
+                    if location_value and location_value.upper() in base_name.upper():
+                        shortcut = os.getenv(f"SHORTCUT_{i}", "")
+                        break
 
-                # Send the shortcut or original name if no match
+                # Send the shortcut or original filename if no match
                 final_text = shortcut if shortcut else base_name
                 await send_with_retry(context.bot.send_message, chat_id=TARGET_CHAT_ID, text=f"{final_text}")
+
 
         except Exception as exc:
             await context.bot.send_message(chat_id=chat_id, text="Error processing PDF. Try a smaller/cleaner file.")
