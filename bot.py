@@ -125,7 +125,16 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 shortcut = None
                 for i in range(1, 46):
                     location_value = os.getenv(f"LOCATION_{i}", "")
-                    if location_value and location_value.upper() in base_name.upper():
+                    if not location_value:
+                        continue
+                    # Strip the "KOI Thé " prefix (case-insensitive) so that
+                    # filenames without the brand prefix still match.
+                    prefix = "KOI Thé "
+                    if location_value.lower().startswith(prefix.lower()):
+                        match_name = location_value[len(prefix):]
+                    else:
+                        match_name = location_value
+                    if match_name and match_name.upper() in base_name.upper():
                         shortcut = os.getenv(f"SHORTCUT_{i}", "")
                         break
 
