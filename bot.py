@@ -16,6 +16,20 @@ TOKEN = "8555727406:AAGP2-fR8GCUJBOr8AhblJw0-G7WNWrOocU"
 TARGET_CHAT_ID = -5240584670  # replace with your destination group ID
 chat_locks = defaultdict(asyncio.Lock)
 
+# Build shortcuts dictionary from environment variables
+LOCATION_SHORTCUTS = {}
+for i in range(1, 46):
+    location_value = os.getenv(f"LOCATION_{i}", "")
+    shortcut_value = os.getenv(f"SHORTCUT_{i}", "")
+    if location_value and shortcut_value:
+        # Strip the "KOI Thé " prefix (case-insensitive) for matching
+        prefix = "KOI Thé "
+        if location_value.lower().startswith(prefix.lower()):
+            match_name = location_value[len(prefix):]
+        else:
+            match_name = location_value
+        LOCATION_SHORTCUTS[match_name.upper()] = shortcut_value
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Send me a PDF, and I will return extracted images.")
 
@@ -106,7 +120,17 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await send_images_batch(update, context, filtered_images, TARGET_CHAT_ID)
 
                 base_name = os.path.splitext(file.file_name or "file.pdf")[0]
-                await send_with_retry(context.bot.send_message, chat_id=TARGET_CHAT_ID, text=f"{base_name}")
+
+                # Extract shortcut from base_name using the dictionary
+                shortcut = None
+                for location_key, shortcut_value in LOCATION_SHORTCUTS.items():
+                    if location_key in base_name.upper():
+                        shortcut = shortcut_value
+                        break
+
+                # Send the shortcut or original name if no match
+                final_text = shortcut if shortcut else base_name
+                await send_with_retry(context.bot.send_message, chat_id=TARGET_CHAT_ID, text=f"{final_text}")
 
         except Exception as exc:
             await context.bot.send_message(chat_id=chat_id, text="Error processing PDF. Try a smaller/cleaner file.")
