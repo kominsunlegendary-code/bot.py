@@ -16,17 +16,6 @@ TOKEN = "8555727406:AAGP2-fR8GCUJBOr8AhblJw0-G7WNWrOocU"
 TARGET_CHAT_ID = -5240584670  # replace with your destination group ID
 chat_locks = defaultdict(asyncio.Lock)
 
-from datetime import datetime, timezone, timedelta, time
-
-ICT = timezone(timedelta(hours=7))
-
-ACTIVE_START = time(9, 0)   # 9:00 AM ICT
-ACTIVE_END = time(22, 0)    # 10:00 PM ICT
-
-def is_active_window():
-    now = datetime.now(ICT).time()
-    return ACTIVE_START <= now <= ACTIVE_END
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Send me a PDF, and I will return extracted images.")
 
@@ -65,9 +54,6 @@ async def send_images_batch(update: Update, context: ContextTypes.DEFAULT_TYPE, 
 
 async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
-    if not is_active_window():
-        await context.bot.send_message(chat_id=chat_id, text="Service hours are 09:00-22:00. Please try again during that period.")
-        return
 
     lock = chat_locks[chat_id]
     async with lock:
@@ -120,28 +106,7 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await send_images_batch(update, context, filtered_images, TARGET_CHAT_ID)
 
                 base_name = os.path.splitext(file.file_name or "file.pdf")[0]
-
-                # Extract shortcut from base_name
-                shortcut = None
-                for i in range(1, 46):
-                    location_value = os.getenv(f"LOCATION_{i}", "")
-                    if not location_value:
-                        continue
-                    # Strip the "KOI Thé " prefix (case-insensitive) so that
-                    # filenames without the brand prefix still match.
-                    prefix = "KOI Thé "
-                    if location_value.lower().startswith(prefix.lower()):
-                        match_name = location_value[len(prefix):]
-                    else:
-                        match_name = location_value
-                    if match_name and match_name.upper() in base_name.upper():
-                        shortcut = os.getenv(f"SHORTCUT_{i}", "")
-                        break
-
-
-                # Send the shortcut or original name if no match
-                final_text = shortcut if shortcut else base_name
-                await send_with_retry(context.bot.send_message, chat_id=TARGET_CHAT_ID, text=f"{final_text}")
+                await send_with_retry(context.bot.send_message, chat_id=TARGET_CHAT_ID, text=f"{base_name}")
 
         except Exception as exc:
             await context.bot.send_message(chat_id=chat_id, text="Error processing PDF. Try a smaller/cleaner file.")
@@ -172,5 +137,3 @@ async def fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app.add_handler(MessageHandler(filters.ALL, fallback))
 
 app.run_polling(timeout=120)
-
-
